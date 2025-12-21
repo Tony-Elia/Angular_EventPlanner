@@ -1,0 +1,42 @@
+services:
+  frontend:
+    image: frontend-inn
+    container_name: frontend
+    ports:
+      - "5025:80"
+    environment:
+      API_URL: http://localhost:8001
+    depends_on:
+      - backend
+
+  backend:
+    image: tonyelia03/fastapi-backend:1.6
+    container_name: backend
+    ports:
+      - "8001:8000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - DB_NAME=event_planning
+      - APP_SECRET=MY-SECRET
+
+    depends_on:
+      - mongo
+    networks:
+      - db-network
+
+  mongo:
+    image: mongo
+    container_name: db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - db-network
+
+networks:
+  db-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
